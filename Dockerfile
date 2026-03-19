@@ -1,5 +1,5 @@
-# Stage 1: Build with Java 8
-FROM eclipse-temurin:8-jdk-alpine AS builder
+# Stage 1: Build with Maven and Java 8
+FROM maven:3.9.9-eclipse-temurin-8 AS builder
 WORKDIR /build
 COPY . .
 RUN mvn clean install -DskipTests

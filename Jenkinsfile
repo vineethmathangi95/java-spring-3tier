@@ -32,13 +32,13 @@ pipeline {
 
         stage('docker tagging ') {
             steps {
-                sh 'docker tag java-spring:v${BUILD_NUMBER} vineethmathangi95/devops:spring-v${BUILD_NUMBER}'
+                sh 'docker tag java-spring:v${BUILD_NUMBER} vineethmathangi95/threetier:spring-v${BUILD_NUMBER}'
             }
         }
 
         stage('image push dockerhub ') {
             steps {
-                sh 'docker push vineethmathangi95/devops:spring-v${BUILD_NUMBER}'
+                sh 'docker push vineethmathangi95/threetier:spring-v${BUILD_NUMBER}'
             }
         }
 

@@ -3,8 +3,7 @@ pipeline {
     options { 
        buildDiscarder(logRotator(numToKeepStr: '10')) 
        timestamps()
-       
-       }
+    }
     tools {
       maven 'maven'
     }
@@ -22,46 +21,35 @@ pipeline {
                 sh 'docker build -t java-spring:v${BUILD_NUMBER} .'
             }
         }
+
         stage('docker login ') {
             steps {
-                sh 'docker login '
+                sh 'docker login'
             }
         }
+
         stage('docker tagging ') {
             steps {
                 sh 'docker tag java-spring:v${BUILD_NUMBER} vineethmathangi95/devops:spring-v${BUILD_NUMBER}'
             }
         }
-      stage('image push dockerhub ') {
+
+        stage('image push dockerhub ') {
             steps {
                 sh 'docker push vineethmathangi95/devops:spring-v${BUILD_NUMBER}'
             }
         }
-/*
-      stage('push ECR'){
+
+        /*
+        stage('push ECR'){
             steps {
                 sh '''aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 897276212041.dkr.ecr.us-west-2.amazonaws.com
-           		    
-			docker tag java-spring-19:v${BUILD_NUMBER} 897276212041.dkr.ecr.us-west-2.amazonaws.com/devops19-java:v${BUILD_NUMBER}
-                    	 docker push 897276212041.dkr.ecr.us-west-2.amazonaws.com/devops19-java:v${BUILD_NUMBER}
-		   
-       '''
+                       
+                       docker tag java-spring-19:v${BUILD_NUMBER} 897276212041.dkr.ecr.us-west-2.amazonaws.com/devops19-java:v${BUILD_NUMBER}
+                       docker push 897276212041.dkr.ecr.us-west-2.amazonaws.com/devops19-java:v${BUILD_NUMBER}
+                '''
             }
-          }
-*/
+        }
+        */
     }
-    post{
-        always{
-            emailext body: '''Hi,
-
-     The jenkins has been failed . please check it.
-
-     Thanks
-     Devops Team''', subject: 'testing jenkins pipeline: $JOB_URL', to: 'malleshdevops2021@outlook.com'
-    }
-    cleanup{
-     cleanWs()
-    }
-    }
-
 }

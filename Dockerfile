@@ -1,12 +1,5 @@
-# Stage 1: Build with Maven and Java 8
-FROM maven:3.9.9-eclipse-temurin-8 AS builder
-WORKDIR /build
-COPY . .
-RUN mvn clean install -DskipTests
-
-# Stage 2: Runtime with Java 8
-FROM eclipse-temurin:8-jre-alpine
+FROM eclipse-temurin:8-jdk
 WORKDIR /app
-COPY --from=builder /build/target/*.jar app.jar
+COPY target/*.jar app.jar
 EXPOSE 8080
 ENTRYPOINT ["java","-jar","app.jar"]

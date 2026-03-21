@@ -5,6 +5,7 @@ pipeline {
        timestamps()
     }
     tools {
+      jdk 'jdk8'
       maven 'maven'
     }
 

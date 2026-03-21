@@ -54,11 +54,11 @@ pipeline {
                 '''
             }
         }
-        */
+        
     }
 }
-*/
 
+*/
 pipeline {
     agent any
     options { 

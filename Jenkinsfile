@@ -1,3 +1,4 @@
+/*
 pipeline {
     agent any
     options { 
@@ -54,5 +55,74 @@ pipeline {
             }
         }
         */
+    }
+}
+*/
+
+pipeline {
+    agent any
+    options { 
+       buildDiscarder(logRotator(numToKeepStr: '10')) 
+       timestamps()
+    }
+
+    stages {
+
+        stage('maven build (Java 8)') {
+            agent {
+                docker { 
+                    image 'maven:3.9.9-eclipse-temurin-8'  // Maven + JDK 8
+                    args '-v $HOME/.m2:/root/.m2'        // cache Maven dependencies
+                }
+            }
+            steps {
+                sh 'mvn clean install -DskipTests'
+                sh 'mvn clean package'
+            }
+        }
+
+        stage('docker image build') {
+            steps {
+                sh 'docker build -t java-spring:v${BUILD_NUMBER} .'
+            }
+        }
+
+        stage('docker login') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-cred', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+                }
+            }
+        }
+
+        stage('docker tagging') {
+            steps {
+                sh 'docker tag java-spring:v${BUILD_NUMBER} vineethmathangi95/threetier:spring-v${BUILD_NUMBER}'
+            }
+        }
+
+        stage('image push dockerhub') {
+            steps {
+                sh 'docker push vineethmathangi95/threetier:spring-v${BUILD_NUMBER}'
+            }
+        }
+
+        /*
+        stage('push ECR') {
+            steps {
+                sh '''
+                aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 897276212041.dkr.ecr.us-west-2.amazonaws.com
+                docker tag java-spring-19:v${BUILD_NUMBER} 897276212041.dkr.ecr.us-west-2.amazonaws.com/devops19-java:v${BUILD_NUMBER}
+                docker push 897276212041.dkr.ecr.us-west-2.amazonaws.com/devops19-java:v${BUILD_NUMBER}
+                '''
+            }
+        }
+        */
+    }
+
+    post {
+        cleanup {
+            cleanWs()
+        }
     }
 }

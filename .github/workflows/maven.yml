@@ -1,0 +1,26 @@
+name: docker
+
+on:
+  workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      IMAGE_NAME: vineethmathangi95/threetier:actions
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 1. Set Java
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: 17
+
+      # 2. Build with Maven
+      - name: Maven Build
+        run: mvn clean package
